@@ -1,0 +1,185 @@
+---
+title: "hw9"
+output: html_document
+date: '2022-04-08'
+---
+
+
+ 
+##Problem 1 
+```{r}
+#1. Download DNASeqs.RData from Canvas and then load it into your R workspace. The data frame dna.seq has 11 rows and 1620 columns, where each row vector is the DNA sequence of some protein. The length of the sequence is 1620, and each column represents one nucleotide.Run the following code to compute the distance matrix, dna.dist.
+
+
+load("DNASeqs.Rdata")
+n <- nrow(dna.seq)
+D <- matrix(0, nrow=n, ncol=n) # create an empty n-by-n matrix
+row.names(D) <- row.names(dna.seq)
+for (i in 1:n){
+for (j in 1:i){
+D[i, j] <- sum(dna.seq[i,] != dna.seq[j,])
+}
+}
+# convert the numeric matrix D to a "distance matrix" object
+dna.dist = as.dist(D) 
+
+as.dist(D)
+
+#(i) Notice that we calculated the distance matrix dna.dist ourselves. According to the code, how did we calculate the distance between two proteins? Explain it in words. (Hint: sum of a logical vector returns the number of entries equal to TRUE.)
+
+#We calculated the distance between the two proteins, by summing the entries, specifically all of the row vectors, and then converting into a matrix of all the distances.Based on this, I think we calculated using hamming distance, which is the distance between binary vectors. A clue for this could be that we do summation and then we compare that they aren't equal to each other. 
+
+
+
+
+#ii) Plot the UPGMA phylogenetic tree (i.e. average linkage) using dna.dist as the input distance matrix. Attach your R code and plot.
+
+clust.dna = hclust(d = dna.dist, method="average")
+plot(clust.dna)
+
+
+
+#(iii) Which two proteins are clustered in the first step of building the UPGMA tree?
+
+
+#The two proteins that are clustred in the first step would be the proteins with the smallest average distance, which would be Pcy 9 and Pvi 10. 
+
+
+
+#(iv) What is the maximum height of the UPGMA tree? Keep at least 2 decimal places.
+
+clust.dna$height 
+
+
+#The maximum height of the UPGMA tree is 120.6786.
+
+
+
+
+#(v)Divide the 11 proteins into 2 clusters according to the UPGMA tree. What are the two clusters (i.e., which proteins are in the 1st cluster and which are in the 2nd)?
+
+
+#Cluster 1 : Pga 11, Pcy 9, Pvi 10, Plo6, Pkn8, Pre1, Pfr 7
+
+#Cluster 2: Pma 3, Pfa 4, Pme2, Pbe5
+
+
+
+
+#(vi) Plot the phylogenetic tree using dna.dist and complete linkage. Attach your R code and plot.
+
+plot(hclust(dna.dist, method="complete"))
+
+
+#(vii) For the tree built using complete linkage, observe that the two proteins connected at the first step are the same as those for the UPGMA tree. Is it a coincidence? Why?
+
+
+#This is not a coincidence because the the matrix that had calculated the distance started with the smallest distance, so this is the same regardless as the smallest distance whether you use complete or average linkage. 
+
+
+#(viii) The maximum height of the tree built using complete linkage is obviously greater than that of the UPGMA tree. Why?
+
+#The maximum height of the tree built using complete linkage is obviously greater because since it creates naturally distinct clumps, it makes sure to use the maximum distance between proteins in the tree when clustering. So, this allows there to be more distinction and distance beween proteins, making the height much greater. On the other hand, UPGMA is an average, which causes the proteins to have less distance between them and less height difference as well. 
+  
+
+```
+
+
+
+
+
+
+
+
+##Problem 2
+```{r}
+##2. Download BreastCancer.RData from Canvas, which includes an R data frame cancer, and load it into your workspace. (This dataset is obtained from UCI Machine Learning Repository: http://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Coimbra.) We use this dataset for both this problem and the next one. Below is a “pairs” plot for four variables Glucose, Insulin, HOMA and Classification in the cancer dataset. (The R code for generating this plot can be found in the Rmd file.) Note that Classification is treated as a factor, i.e., a categorical variable (0: healthy controls; 1: cancer patients). Answer the following questions according to the plot.
+
+#load("cancer.RData")
+
+
+
+
+#(i) Do we have more cancer patients or more healthy controls in this dataset?
+
+
+#In this dataset, it looks like we have 63 cancer patients and 53 healthy controls. So, we have more cancer patients in the dataset. 
+
+
+#(ii) Does the cancer patient tend to have a higher or lower Glucose level?
+
+
+
+#In general, it looks like the cancer patients tend to have a higher glucose level compared to the healthy controls. This is based on the dataset, as well as the boxplot, which has a larger range and higher median. 
+
+
+#(iii) What is the correlation between Glucose and Insulin (just ignore ***)? If Glucose increases, does Insulin tend to increase or decrease?
+
+
+#It appears that Glucose and Insulin's correlation coefficient is 0.505, which means that it looks like when glucose increases, insulin tends to increase as well. It's a positive correlation, though it's pretty moderate. 
+
+
+
+#(iv) Suppose we know the value of Insulin for some individual, and we want to use it to predict both Glucose and HOMA. Which prediction will be more accurate, Glucose or HOMA? Briefly explain the reason.
+
+
+#Based on the scatterplot, it looks like that HOMA would be used to have a better prediction. This is because the correlation coefficient is 0.932, which is a very strong positive correlation.
+
+
+
+
+```
+
+
+
+
+
+##Problem 3
+```{r}
+##3. Create another matrix by:
+
+
+
+load("BreastCancer.RData")
+cancer.X <- cancer[,1:9]
+
+cancer.X
+
+
+#Hence, cancer.X contains 9 continuous variables, but not Classification.
+
+
+#(i) Use the apply function to compute the standard deviation of each variable (i.e., each column of cancer.X). Attach your R code and output.
+
+
+
+
+col.sd <- apply(X = cancer.X, MARGIN = 2, FUN = sd)
+col.sd
+
+
+
+#(ii) Use scale function to standardize the data and then calculate the correlation matrix for the standardized data. Attach your R code (but do not attach the correlation matrix you obtain).
+
+
+stand.cancer <- scale(cancer.X)
+
+
+cor(stand.cancer)
+
+
+
+#(iii) What is the correlation between Glucose and Insulin after standardization?
+
+
+#The correlation between Glucose and Insulin after standardization is 0.50465307. 
+
+
+cor(cancer.X) - cor(stand.cancer)
+
+
+
+
+
+```
+
